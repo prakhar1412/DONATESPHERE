@@ -30,23 +30,20 @@ const Donate = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simulate small delay for UI feel
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-      const newDonation = {
-        id: Date.now(),
-        amount: Number(amount),
-        date: new Date().toISOString().split('T')[0],
-        status: "completed",
-        userEmail: user?.email || "anonymous"
-      };
+      const res = await fetch("http://localhost:5000/api/donations", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: Number(amount),
+          userEmail: user?.email || "anonymous",
+          date: new Date().toISOString().split('T')[0]
+        })
+      });
 
-      // Get existing donations
-      const existingRaw = localStorage.getItem("donatesphere_donations");
-      const existing = existingRaw ? JSON.parse(existingRaw) : [];
-
-      // Save new donation
-      localStorage.setItem("donatesphere_donations", JSON.stringify([newDonation, ...existing]));
+      if (!res.ok) throw new Error("Failed to save donation");
 
       toast({
         title: "Donation Successful!",

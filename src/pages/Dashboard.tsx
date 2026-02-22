@@ -12,13 +12,20 @@ const Dashboard = () => {
   const [donations, setDonations] = useState<any[]>([]);
 
   useEffect(() => {
-    if (user) {
-      const storedRaw = localStorage.getItem("donatesphere_donations");
-      const allDonations = storedRaw ? JSON.parse(storedRaw) : [];
-      // Filter only this user's donations
-      const userDonations = allDonations.filter((d: any) => d.userEmail === user.email);
-      setDonations(userDonations);
-    }
+    const fetchDonations = async () => {
+      if (user?.email) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/donations/${user.email}`);
+          if (res.ok) {
+            const data = await res.json();
+            setDonations(data);
+          }
+        } catch (err) {
+          console.error("Failed to fetch donations", err);
+        }
+      }
+    };
+    fetchDonations();
   }, [user]);
 
   // Show nothing while auth is loading

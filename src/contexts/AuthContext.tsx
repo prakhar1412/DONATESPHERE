@@ -20,6 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const GOOGLE_CLIENT_ID = "331084500815-ni47i9omtdr35qvehfa9hnbe4g5k8lf9.apps.googleusercontent.com";
+const API_URL = "http://localhost:5000/api";
 
 // Helper to decode JWT (Google credential is a JWT)
 function decodeJwt(token: string) {
@@ -65,17 +66,49 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, [user]);
 
     // Handle Google credential response
-    const handleGoogleCredential = useCallback((response: google.accounts.id.CredentialResponse) => {
+    const handleGoogleCredential = useCallback(async (response: google.accounts.id.CredentialResponse) => {
         const decoded = decodeJwt(response.credential);
         if (decoded) {
-            const googleUser: User = {
-                id: decoded.sub,
+            const googleData = {
                 name: decoded.name,
                 email: decoded.email,
                 picture: decoded.picture,
-                provider: "google",
+                provider: "google" as const,
+                id: decoded.sub
             };
-            setUser(googleUser);
+
+            try {
+                // Sync with MongoDB backend
+                const res = await fetch(`${API_URL}/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(googleData)
+                });
+
+                // If user exists, signup endpoint returns 400, but we can still log in
+                // In a more robust app, we'd handle this better
+                const userData = await res.json();
+
+                const googleUser: User = {
+                    id: decoded.sub,
+                    name: decoded.name,
+                    email: decoded.email,
+                    picture: decoded.picture,
+                    provider: "google",
+                };
+                setUser(googleUser);
+            } catch (err) {
+                console.error("Failed to sync Google user with backend", err);
+                // Fallback to local session even if backend sync fails (standard for simple apps)
+                const googleUser: User = {
+                    id: decoded.sub,
+                    name: decoded.name,
+                    email: decoded.email,
+                    picture: decoded.picture,
+                    provider: "google",
+                };
+                setUser(googleUser);
+            }
         }
     }, []);
 
@@ -104,9 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const signInWithGoogle = useCallback(() => {
         if (window.google?.accounts?.id) {
             window.google.accounts.id.prompt((notification) => {
-                // If One Tap is suppressed or user closes it, fall back to button-click popup
                 if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                    // Use the popup flow via the Google button
                     const btn = document.getElementById("google-signin-btn");
                     if (btn) {
                         window.google.accounts.id.renderButton(btn, {
@@ -123,40 +154,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const signInWithEmail = useCallback(async (email: string, password: string) => {
-        // Simulated email sign-in — replace with real API
-        if (!email || !password) throw new Error("Email and password are required");
-        if (password.length < 6) throw new Error("Password must be at least 6 characters");
+        const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
 
-        // Mock: check if user exists in localStorage
-        const usersRaw = localStorage.getItem("donatesphere_users");
-        const users: Array<{ name: string; email: string; password: string }> = usersRaw ? JSON.parse(usersRaw) : [];
-        const found = users.find((u) => u.email === email && u.password === password);
-        if (!found) throw new Error("Invalid email or password");
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Invalid email or password");
+        }
 
+        const userData = await res.json();
         setUser({
-            id: btoa(email),
-            name: found.name,
-            email: found.email,
+            id: userData._id,
+            name: userData.name,
+            email: userData.email,
+            picture: userData.picture,
             provider: "email",
         });
     }, []);
 
     const signUpWithEmail = useCallback(async (name: string, email: string, password: string) => {
-        // Simulated email sign-up — replace with real API
-        if (!name || !email || !password) throw new Error("All fields are required");
-        if (password.length < 6) throw new Error("Password must be at least 6 characters");
+        const res = await fetch(`${API_URL}/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, provider: "email" })
+        });
 
-        const usersRaw = localStorage.getItem("donatesphere_users");
-        const users: Array<{ name: string; email: string; password: string }> = usersRaw ? JSON.parse(usersRaw) : [];
-        if (users.find((u) => u.email === email)) throw new Error("An account with this email already exists");
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Sign up failed");
+        }
 
-        users.push({ name, email, password });
-        localStorage.setItem("donatesphere_users", JSON.stringify(users));
-
+        const userData = await res.json();
         setUser({
-            id: btoa(email),
-            name,
-            email,
+            id: userData._id,
+            name: userData.name,
+            email: userData.email,
+            picture: userData.picture,
             provider: "email",
         });
     }, []);
