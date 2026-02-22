@@ -108,7 +108,7 @@ const Dashboard = () => {
                 </div>
                 <span className="text-sm text-muted-foreground">Total Donated</span>
               </div>
-              <p className="text-2xl font-bold text-foreground font-sans">${totalDonated}</p>
+              <p className="text-2xl font-bold text-foreground font-sans">₹{totalDonated.toLocaleString('en-IN')}</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-5 card-elevated">
               <div className="flex items-center gap-3 mb-2">
@@ -154,7 +154,7 @@ const Dashboard = () => {
                       <DollarSign className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground text-sm">${d.amount}.00</p>
+                      <p className="font-medium text-foreground text-sm">₹{d.amount.toLocaleString('en-IN')}.00</p>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Calendar className="h-3 w-3" />
                         {d.date}

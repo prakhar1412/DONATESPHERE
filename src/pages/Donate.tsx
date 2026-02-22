@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
-const presetAmounts = [10, 25, 50, 100];
+const presetAmounts = [100, 500, 1000, 2000];
 
 const Donate = () => {
   const [amount, setAmount] = useState("");
@@ -47,7 +47,7 @@ const Donate = () => {
 
       toast({
         title: "Donation Successful!",
-        description: `Thank you for your contribution of $${amount}.`,
+        description: `Thank you for your contribution of ₹${Number(amount).toLocaleString('en-IN')}.`,
       });
 
       navigate("/success");
@@ -91,18 +91,18 @@ const Donate = () => {
                       : "bg-secondary text-secondary-foreground border-border hover:border-primary/50"
                       }`}
                   >
-                    ${val}
+                    ₹{val}
                   </button>
                 ))}
               </div>
 
               <div className="space-y-2 mb-6">
-                <Label htmlFor="amount">Custom Amount ($)</Label>
+                <Label htmlFor="amount">Custom Amount (₹)</Label>
                 <Input
                   id="amount"
                   type="number"
                   min="1"
-                  placeholder="Enter amount"
+                  placeholder="Enter amount in ₹"
                   value={amount}
                   onChange={(e) => {
                     setAmount(e.target.value);
@@ -113,7 +113,7 @@ const Donate = () => {
               </div>
 
               <Button className="w-full" size="lg" disabled={!amount || Number(amount) <= 0 || isSubmitting}>
-                {isSubmitting ? "Processing..." : `Donate $${amount || "0"}`}
+                {isSubmitting ? "Processing..." : `Donate ₹${amount ? Number(amount).toLocaleString('en-IN') : "0"}`}
               </Button>
             </form>
 
