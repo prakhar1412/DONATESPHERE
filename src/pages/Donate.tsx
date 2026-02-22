@@ -7,6 +7,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { loadStripe } from "@stripe/stripe-js";
+
+// Placeholder Stripe Publishable Key - replace with your actual key
+const stripePromise = loadStripe("pk_test_51...your_publishable_key");
 
 const presetAmounts = [100, 500, 1000, 2000];
 
@@ -30,34 +34,29 @@ const Donate = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate small delay for UI feel
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      const res = await fetch("http://localhost:5000/api/donations", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      // Create Stripe Checkout Session via backend
+      const response = await fetch("http://localhost:5000/api/payments/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: Number(amount),
           userEmail: user?.email || "anonymous",
-          date: new Date().toISOString().split('T')[0]
-        })
+        }),
       });
 
-      if (!res.ok) throw new Error("Failed to save donation");
+      if (!response.ok) throw new Error("Failed to create checkout session");
 
-      toast({
-        title: "Donation Successful!",
-        description: `Thank you for your contribution of ₹${Number(amount).toLocaleString('en-IN')}.`,
-      });
+      const { url } = await response.json();
 
-      navigate("/success");
+      // Redirect to Stripe Checkout
+      window.location.href = url;
     } catch (error) {
+      console.error("Payment Error:", error);
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
+        title: "Payment Error",
+        description: "Could not initiate payment. Please try again later.",
+        variant: "destructive",
       });
-    } finally {
       setIsSubmitting(false);
     }
   };
