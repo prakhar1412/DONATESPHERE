@@ -1,4 +1,3 @@
-import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Footer = () => (
@@ -6,8 +5,8 @@ const Footer = () => (
     <div className="container mx-auto px-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <Link to="/" className="flex items-center gap-2 font-display text-lg font-bold text-foreground mb-3">
-            <Heart className="h-5 w-5 text-primary fill-primary" />
+          <Link to="/" className="flex items-center gap-3 font-display text-lg font-bold text-foreground mb-3">
+            <img src="/favicon.jpg" alt="DonateSphere Logo" className="h-7 w-7 rounded-md object-cover shadow-sm" />
             DonateSphere
           </Link>
           <p className="text-sm text-muted-foreground max-w-xs">

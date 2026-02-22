@@ -2,7 +2,6 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -28,7 +27,7 @@ const Donate = () => {
         >
           <div className="bg-card rounded-2xl border border-border p-8 card-elevated">
             <div className="flex items-center justify-center gap-2 mb-6">
-              <Heart className="h-6 w-6 text-primary fill-primary animate-float" />
+              <img src="/favicon.jpg" alt="DonateSphere Logo" className="h-10 w-10 rounded-xl object-cover shadow-md animate-float" />
             </div>
             <h1 className="text-2xl font-display font-bold text-center text-foreground mb-1">Make a Donation</h1>
             <p className="text-center text-muted-foreground text-sm mb-6">Choose an amount and donate securely</p>
@@ -39,11 +38,10 @@ const Donate = () => {
                 <button
                   key={val}
                   onClick={() => handlePreset(val)}
-                  className={`rounded-lg py-3 text-sm font-semibold border transition-all ${
-                    selected === val
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-secondary text-secondary-foreground border-border hover:border-primary/50"
-                  }`}
+                  className={`rounded-lg py-3 text-sm font-semibold border transition-all ${selected === val
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-secondary text-secondary-foreground border-border hover:border-primary/50"
+                    }`}
                 >
                   ${val}
                 </button>

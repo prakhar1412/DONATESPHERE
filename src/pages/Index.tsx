@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Heart, Shield, Zap, BarChart3 } from "lucide-react";
+import { Shield, Zap, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-image.jpg";
 
@@ -49,7 +49,7 @@ const Index = () => {
             className="max-w-2xl mx-auto text-center"
           >
             <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-              <Heart className="h-4 w-4 fill-primary" />
+              <img src="/favicon.jpg" alt="" className="h-4 w-4 rounded-full object-cover" />
               Give with confidence
             </div>
             <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground leading-tight mb-6">

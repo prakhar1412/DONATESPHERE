@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,8 +50,8 @@ const Login = () => {
           className="w-full max-w-md"
         >
           <div className="bg-card rounded-2xl border border-border p-8 card-elevated">
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <Heart className="h-6 w-6 text-primary fill-primary" />
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <img src="/favicon.jpg" alt="DonateSphere Logo" className="h-8 w-8 rounded-lg object-cover shadow-sm" />
               <span className="font-display text-xl font-bold text-foreground">DonateSphere</span>
             </div>
             <h1 className="text-2xl font-display font-bold text-center text-foreground mb-1">Welcome back</h1>

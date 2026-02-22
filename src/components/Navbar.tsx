@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,8 +35,8 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
-          <Heart className="h-6 w-6 text-primary fill-primary" />
+        <Link to="/" className="flex items-center gap-3 font-display text-xl font-bold text-foreground">
+          <img src="/favicon.jpg" alt="DonateSphere Logo" className="h-8 w-8 rounded-lg object-cover shadow-sm" />
           DonateSphere
         </Link>
 

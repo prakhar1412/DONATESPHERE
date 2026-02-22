@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Link, Navigate } from "react-router-dom";
-import { Heart, DollarSign, TrendingUp, Calendar } from "lucide-react";
+import { DollarSign, TrendingUp, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -109,8 +109,8 @@ const Dashboard = () => {
             </div>
             <div className="bg-card border border-border rounded-xl p-5 card-elevated">
               <div className="flex items-center gap-3 mb-2">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Heart className="h-4 w-4 text-primary fill-primary" />
+                <div className="h-9 w-9 rounded-lg overflow-hidden flex items-center justify-center">
+                  <img src="/favicon.jpg" alt="" className="h-full w-full object-cover" />
                 </div>
                 <span className="text-sm text-muted-foreground">Impact Level</span>
               </div>
