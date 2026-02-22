@@ -5,18 +5,21 @@ import { DollarSign, TrendingUp, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-const mockDonations = [
-  { id: 1, amount: 50, date: "2026-02-20", status: "completed" },
-  { id: 2, amount: 25, date: "2026-02-15", status: "completed" },
-  { id: 3, amount: 100, date: "2026-02-10", status: "completed" },
-  { id: 4, amount: 75, date: "2026-01-28", status: "completed" },
-];
-
-const totalDonated = mockDonations.reduce((s, d) => s + d.amount, 0);
+import { useState, useEffect } from "react";
 
 const Dashboard = () => {
   const { user, isLoading } = useAuth();
+  const [donations, setDonations] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      const storedRaw = localStorage.getItem("donatesphere_donations");
+      const allDonations = storedRaw ? JSON.parse(storedRaw) : [];
+      // Filter only this user's donations
+      const userDonations = allDonations.filter((d: any) => d.userEmail === user.email);
+      setDonations(userDonations);
+    }
+  }, [user]);
 
   // Show nothing while auth is loading
   if (isLoading) {
@@ -33,6 +36,8 @@ const Dashboard = () => {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
+
+  const totalDonated = donations.reduce((s, d) => s + d.amount, 0);
 
   const getInitials = (name: string) =>
     name
@@ -105,7 +110,7 @@ const Dashboard = () => {
                 </div>
                 <span className="text-sm text-muted-foreground">Donations</span>
               </div>
-              <p className="text-2xl font-bold text-foreground font-sans">{mockDonations.length}</p>
+              <p className="text-2xl font-bold text-foreground font-sans">{donations.length}</p>
             </div>
             <div className="bg-card border border-border rounded-xl p-5 card-elevated">
               <div className="flex items-center gap-3 mb-2">
@@ -135,7 +140,7 @@ const Dashboard = () => {
               <h3 className="font-semibold text-foreground font-sans">Recent Donations</h3>
             </div>
             <div className="divide-y divide-border">
-              {mockDonations.map((d) => (
+              {donations.map((d) => (
                 <div key={d.id} className="flex items-center justify-between px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
