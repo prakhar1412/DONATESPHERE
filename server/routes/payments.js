@@ -3,13 +3,13 @@ const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Donation = require('../models/Donation');
 
-// Create a Stripe Checkout Session
+// Create a Stripe Checkout Session (Embedded Mode)
 router.post('/create-checkout-session', async (req, res) => {
     const { amount, userEmail } = req.body;
 
     try {
         const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
+            ui_mode: 'embedded',
             line_items: [
                 {
                     price_data: {
@@ -26,50 +26,57 @@ router.post('/create-checkout-session', async (req, res) => {
             ],
             mode: 'payment',
             customer_email: userEmail,
-            success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL}/donate`,
+            return_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
             metadata: {
                 userEmail,
-                amount
+                amount: String(amount)
             }
         });
 
-        res.json({ id: session.id, url: session.url });
+        res.send({ clientSecret: session.client_secret });
     } catch (err) {
         console.error('Stripe Session Error:', err);
         res.status(500).json({ message: err.message });
     }
 });
 
-// Confirm Payment and Record Donation
-router.post('/confirm', async (req, res) => {
-    const { sessionId } = req.body;
+// Get Session Status and Record Donation
+router.get('/session-status', async (req, res) => {
+    const { session_id } = req.query;
 
     try {
-        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        const session = await stripe.checkout.sessions.retrieve(session_id);
 
-        if (session.payment_status === 'paid') {
+        if (session.status === 'complete') {
             const { userEmail, amount } = session.metadata;
 
             // Check if donation is already recorded
-            const existing = await Donation.findOne({ sessionId: session.id });
-            if (existing) return res.json({ message: 'Already recorded', donation: existing });
+            let donation = await Donation.findOne({ sessionId: session.id });
 
-            const newDonation = new Donation({
-                amount: Number(amount),
-                userEmail,
-                date: new Date().toISOString().split('T')[0],
-                status: 'completed',
-                sessionId: session.id
+            if (!donation) {
+                donation = new Donation({
+                    amount: Number(amount),
+                    userEmail,
+                    date: new Date().toISOString().split('T')[0],
+                    status: 'completed',
+                    sessionId: session.id
+                });
+                await donation.save();
+            }
+
+            res.send({
+                status: session.status,
+                customer_email: session.customer_details.email,
+                donation
             });
-
-            await newDonation.save();
-            res.json({ message: 'Success', donation: newDonation });
         } else {
-            res.status(400).json({ message: 'Payment not completed' });
+            res.send({
+                status: session.status,
+                customer_email: session.customer_details?.email
+            });
         }
     } catch (err) {
-        console.error('Confirmation Error:', err);
+        console.error('Status Check Error:', err);
         res.status(500).json({ message: err.message });
     }
 });

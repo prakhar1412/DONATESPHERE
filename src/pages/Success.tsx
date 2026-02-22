@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, Navigate } from "react-router-dom";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -14,21 +14,23 @@ const Success = () => {
   useEffect(() => {
     const confirmPayment = async () => {
       if (!sessionId) {
-        setStatus("success"); // Fallback for manual navigation
+        setStatus("error");
         return;
       }
 
       try {
-        const res = await fetch("http://localhost:5000/api/payments/confirm", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId }),
-        });
+        // Check session status recursively if needed, but for Stripe Embedded redirect, 
+        // the session is usually 'complete' by the time they hit return_url.
+        const res = await fetch(`http://localhost:5000/api/payments/session-status?session_id=${sessionId}`);
 
         if (res.ok) {
           const data = await res.json();
-          setDonation(data.donation);
-          setStatus("success");
+          if (data.status === 'complete') {
+            setDonation(data.donation);
+            setStatus("success");
+          } else {
+            setStatus("error");
+          }
         } else {
           setStatus("error");
         }
@@ -40,6 +42,10 @@ const Success = () => {
 
     confirmPayment();
   }, [sessionId]);
+
+  if (!sessionId) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <Layout>
