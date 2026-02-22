@@ -12,8 +12,8 @@ import {
   EmbeddedCheckout
 } from "@stripe/react-stripe-js";
 
-// Placeholder Stripe Publishable Key - replace with your actual key
-const stripePromise = loadStripe("pk_test_51SMZxAFHLH2hsEzKaK3R1Gv1oH7Hn4T7V9wX...your_key");
+// This is your test publishable API key.
+const stripePromise = loadStripe("pk_test_51SMZxAFHLH2hsEzKQ4kw6PkqdCzCpWqxzTqQsLzMrlFcaus48PnWV8sf1CNV2XxlkMrDU15cCCBtr7x1WqDfhRp200j7BCk3kI");
 
 const presetAmounts = [100, 500, 1000, 2000];
 

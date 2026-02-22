@@ -28,6 +28,9 @@ const Success = () => {
           if (data.status === 'complete') {
             setDonation(data.donation);
             setStatus("success");
+          } else if (data.status === 'open') {
+            // Redirect back to checkout if session is still open
+            window.location.href = "/donate";
           } else {
             setStatus("error");
           }
