@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# DonateSphere - Small Act, Big Impact
 
 ## Project info
 
